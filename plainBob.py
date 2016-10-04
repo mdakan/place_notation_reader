@@ -14,13 +14,25 @@ def cross(change):
 	print("".join(str(x) for x in change))
 	return change
 
-def plainHunt(n):
+def seconds(change):
+	for bell in range(2,len(change)-1,2):
+		change[bell], change[bell+1] = change[bell+1], change[bell]
+	print("".join(str(x) for x in change))
+	return change
+
+def plainBob(n):
 	rounds = range(1,n+1)
-	curChange = rounds
+	curChange = range(1,n+1)
 	print("".join(str(x) for x in curChange))
-	for _ in range(0,2*n,2):
+	while True:
 		cross(curChange)
-		hunt(curChange)
+		if curChange[0] == 1:
+			seconds(curChange)
+		else:
+			hunt(curChange)
+		if curChange == rounds:
+			break
+			
 
 if __name__ == "__main__":
-   map(plainHunt, (int(x) for x in sys.argv[1:]))
+   map(plainBob, (int(x) for x in sys.argv[1:]))
