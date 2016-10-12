@@ -2,20 +2,70 @@
 
 import sys
 import re
+# from copy import deepcopy
+
+def strChange(arrChange):
+	change = ""
+	for bell in arrChange:
+		if bell == 10:
+			b = "0"
+		elif bell == 11:
+			b = "E"
+		elif bell == 12:
+			b = "T"
+		else:
+			b = str(bell)
+		change = change + " " + b
+	return change
+
+def pNoteExpander(pNote): # this could be changed to capture repetitive leads
+	pNote = pNote.split()
+	lead = pNote[0].split(".")
+	if len(pNote)>1:
+		leadEnd = pNote[1][1:]
+		lead = lead[:-1]+lead[::-1]+[leadEnd]
+	newLead = []
+	for change in lead:
+		newChange = []
+		change = list(change)
+		for place in change:
+		 	if place == "0":
+		 		newChange.append(10)
+	 		elif place == "E":
+	 			newChange.append(11)
+ 			elif place == "T":
+ 				newChange.append(12)
+			elif place != "x":
+				newChange.append(int(place))
+		newLead.append(newChange)
+	return newLead
+
+def getStage(stage):
+	if stage == "E" or stage == "e":
+		return 11
+	elif stage == "T" or stage == "t":
+		return 12
+	elif stage == "0":
+		return 10
+	else:
+		return int(stage)
 
 def pnRegularizer(pNote,stage):
-	if stage == "E" or stage == "e":
-		stageN = 11
-	elif stage == "T" or stage == "t":
-		stageN = 12
+
+	if stage == "10":
+		stage = "0"
+	elif stage == "11":
+		stage = "E"
+	elif stage == "12":
+		stage = "T"
 	else:
-		stageN = int(stage)
+		stage = str(stage)
 
 	pNote = pNote.replace("e","E")
 	pNote = pNote.replace("t","T")
 	pNote = pNote.replace("h","1.")
 	pNote = re.sub(r'([et\d])(?=[xh-])', r'\g<0>.', pNote)
-	if stageN%2==0:
+	if getStage(stage)%2==0:
 		pNote = re.sub(r'[x-]', "x.", pNote)
 		pNote = re.sub(r'([13579E])(?=\.)', r'\g<0>'+stage, pNote)
 	else:
@@ -24,35 +74,45 @@ def pnRegularizer(pNote,stage):
 	pNote = re.sub(r'(?<=[^\dET])([24680T])', r'1\g<1>', pNote)
 	pNote = re.sub(r'^([24680T])', r'1\g<1>', pNote)
 
-	pNote = re.sub(r'\.*(?=[\s\b])', "", pNote)
+	pNote = re.sub(r'\.*(?=[\s\b]|$)', "", pNote)
 
 	return pNote
 
+def methodPrinter(pNote,stage):
+	f = open(" ".join([pNote,stage])+".txt", "w")
+
+	stageN = getStage(stage)
+	lead = pNoteExpander(pNote)
+
+	rounds = range(1,stageN+1)
+	curChange = range(1,stageN+1)
+
+	handstroke = True
+	while True:
+		handstroke = False if handstroke else True
+		for change in lead:
+			print(strChange(curChange))
+			f.write(strChange(curChange)+"\n")
+			i = 0
+			while i<len(rounds)-1:
+				if (i+1) in change:
+					i +=1
+				else:
+					curChange[i], curChange[i+1] = curChange[i+1], curChange[i]
+					i += 2
+		if curChange[0] == 1:
+			print("-")
+		if curChange == rounds:
+			print(strChange(curChange))
+			break
+	f.close()
+
 
 def notationReader(pNote,stage):
-	if stage == "E":
-		stageN = 11
-	elif stage == "T":
-		stageN = 12
-	else:
-		stageN = int(stage)
-	rounds = list(range(1,stageN+1))
-	curChange = list(range(1,stageN+1))
-	pNote = pNote.split()
-	lead = re.sub(r'([et\d])(?=[xh-])', r'\g<0>.', pNote[0])
-	if stageN%2==0:
-		lead = lead.replace("h","1"+str(stage)+".")
-		lead = re.sub(r'[x-]', r'x.', lead)
-	else:
-		lead = lead.replace("h","1.")
-		lead = re.sub(r'[x-]', "1.", lead)
-
-	if len(pNote)>1:
-		lead += ".".join(lead[:-1].split(".").reverse()) + pNote[1][1:]
-	else:
-		lead = lead.rstrip(".")
-	print(lead)
+	pNote = pnRegularizer(pNote,stage)
+	print(pNote)
+	methodPrinter(pNote,stage)
 
 if __name__ == "__main__":
-   # notationReader(str(sys.argv[1]),str(sys.argv[2]))
-	print(pnRegularizer(str(sys.argv[1]),str(sys.argv[2])))
+	notationReader(str(sys.argv[1]),str(sys.argv[2]))
+	# print(pnRegularizer(str(sys.argv[1]),str(sys.argv[2])))
