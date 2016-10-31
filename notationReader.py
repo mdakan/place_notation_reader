@@ -2,7 +2,6 @@
 
 import sys
 import re
-# from copy import deepcopy
 
 def strChange(arrChange):
 	change = ""
@@ -15,10 +14,10 @@ def strChange(arrChange):
 			b = "T"
 		else:
 			b = str(bell)
-		change = change + " " + b
+		change = change + b + " "
 	return change
 
-def pNoteExpander(pNote): # this could be changed to capture repetitive leads
+def pNoteExpander(pNote):
 	pNote = pNote.split()
 	lead = pNote[0].split(".")
 	if len(pNote)>1:
@@ -79,15 +78,16 @@ def pnRegularizer(pNote,stage):
 	return pNote
 
 def methodPrinter(pNote,stage):
-	f = open(" ".join([pNote,stage])+".txt", "w")
-
 	stageN = getStage(stage)
 	lead = pNoteExpander(pNote)
+
+	f = open(" ".join([pNote,stage])+".txt", "w")
+	f.write(str(stageN)+"\n")
 
 	rounds = range(1,stageN+1)
 	curChange = range(1,stageN+1)
 
-	handstroke = True
+	handstroke = True # not used yet, but just in case for later
 	while True:
 		handstroke = False if handstroke else True
 		for change in lead:
@@ -100,10 +100,9 @@ def methodPrinter(pNote,stage):
 				else:
 					curChange[i], curChange[i+1] = curChange[i+1], curChange[i]
 					i += 2
-		if curChange[0] == 1:
-			print("-")
 		if curChange == rounds:
 			print(strChange(curChange))
+			f.write(strChange(curChange)+"\n")
 			break
 	f.close()
 
