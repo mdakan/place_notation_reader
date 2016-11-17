@@ -66,17 +66,24 @@ def pnRegularizer(pNote, stage):
     pNote = pNote.replace("e", "E")
     pNote = pNote.replace("t", "T")
     pNote = pNote.replace("h", "1.")
-    pNote = re.sub(r'([et\d])(?=[xh-])', r'\g<0>.', pNote)
+    pNote = re.sub(r'([ET\d])(?=[xh-])', r'\g<0>.', pNote)
+    # print(pNote)
+
     if getStage(stage) % 2 == 0:
         pNote = re.sub(r'[x-]', "x.", pNote)
         pNote = re.sub(r'([13579E])(?=\.)', r'\g<0>'+stage, pNote)
     else:
         pNote = re.sub(r'[x-]', stage+".", pNote)
         pNote = re.sub(r'([24680T])(?=\.)', r'\g<0>'+stage, pNote)
+    # print(pNote)
+
+    pNote = re.sub(r'(?<=[^\.l])1', r'.1', pNote)
     pNote = re.sub(r'(?<=[^\dET])([24680T])', r'1\g<1>', pNote)
     pNote = re.sub(r'^([24680T])', r'1\g<1>', pNote)
+    # print(pNote)
 
     pNote = re.sub(r'\.*(?=[\s\b]|$)', "", pNote)
+    # print(pNote)
 
     return pNote
 
@@ -85,7 +92,7 @@ def methodPrinter(pNote, stage):
     stageN = getStage(stage)
     lead = pNoteExpander(pNote)
 
-    f = open(" ".join([pNote, stage])+".txt", "w")
+    f = open("text/%s %s.txt" % (pNote, stage), "w")
     f.write(str(stageN)+"\n")
 
     rounds = range(1, stageN+1)
@@ -95,7 +102,7 @@ def methodPrinter(pNote, stage):
     while True:
         handstroke = False if handstroke else True
         for change in lead:
-            print(strChange(curChange))
+            # print(strChange(curChange))
             f.write(strChange(curChange)+"\n")
             i = 0
             while i < len(rounds)-1:
@@ -105,7 +112,7 @@ def methodPrinter(pNote, stage):
                     curChange[i], curChange[i+1] = curChange[i+1], curChange[i]
                     i += 2
         if curChange == rounds:
-            print(strChange(curChange))
+            # print(strChange(curChange))
             f.write(strChange(curChange)+"\n")
             break
     f.close()
@@ -113,9 +120,9 @@ def methodPrinter(pNote, stage):
 
 def notationReader(pNote, stage):
     pNote = pnRegularizer(pNote, stage)
-    print(pNote)
+    # print(pNote)
     methodPrinter(pNote, stage)
+    return "%s %s" % (pNote, stage)
 
 if __name__ == "__main__":
-    notationReader(str(sys.argv[1]), str(sys.argv[2]))
-    # print(pnRegularizer(str(sys.argv[1]),str(sys.argv[2])))
+    print(notationReader(str(sys.argv[1]), str(sys.argv[2])))

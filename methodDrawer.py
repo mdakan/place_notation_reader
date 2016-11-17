@@ -3,7 +3,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 def methodDrawer(printout):
-    f = open(printout)
+    f = open("text/%s.txt" % (printout))
     stage = int(f.readline())
     fontSize = 36
     rows = f.readlines()
@@ -15,25 +15,24 @@ def methodDrawer(printout):
     x = 10
     y = 10
     r = 0
-    handstroke = True
     prevTrebX = x + fontSize*0.4
     prevTrebY = y + fontSize*0.6
     blueLine = "2"
     prevBlueX = x + fontSize*1.4
     prevBlueY = prevTrebY
+    prevChange = rows[0][0]
     for curChange in rows:
-        handstroke = not handstroke
         curChange = curChange.split()
-        if handstroke and curChange[1] == "1":
-            draw.line((x, y-fontSize*.1, im.size[0]-x, y-fontSize*.1), fill='silver')
         x = 10
         for bell in curChange:
             if bell == "1":
-                draw.line((prevTrebX, prevTrebY, x+fontSize*0.4, y+fontSize*0.6), fill='red', width=2)
+                draw.line((prevTrebX, prevTrebY, x+fontSize*0.4,
+                           y+fontSize*0.6), fill='red', width=2)
                 prevTrebX = x+fontSize*0.4
                 prevTrebY = y+fontSize*0.6
             elif bell == blueLine:
-                draw.line((prevBlueX, prevBlueY, x+fontSize*0.4, y+fontSize*0.6), fill='blue', width=2)
+                draw.line((prevBlueX, prevBlueY, x+fontSize*0.4,
+                           y+fontSize*0.6), fill='blue', width=2)
                 prevBlueX = x+fontSize*0.4
                 prevBlueY = y+fontSize*0.6
             if r % (len(rows)-1) == 0 or (bell != "1" and bell != blueLine):
@@ -41,8 +40,12 @@ def methodDrawer(printout):
             x += fontSize
         y += fontSize*1.2
         r += 1
+        if curChange[0] == "1" and prevChange == "1":
+            draw.line((x, y-fontSize*.1, im.size[0]-x, y-fontSize*.1),
+                      fill='silver')
+        prevChange = curChange[0]
 
-    im.save(printout[:-3]+"jpg")
+    im.save("images/%s.jpg" % (printout))
     f.close()
 
 if __name__ == "__main__":
