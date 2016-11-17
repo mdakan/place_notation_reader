@@ -97,6 +97,7 @@ def methodPrinter(pNote, stage):
 
     rounds = range(1, stageN+1)
     curChange = range(1, stageN+1)
+    print(curChange)
 
     handstroke = True  # not used yet, but just in case for later
     while True:
