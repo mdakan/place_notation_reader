@@ -39,7 +39,7 @@ def methodPlayer(printout):
             data.append([w.getparams(), w.readframes(w.getnframes())])
             w.close()
         if handstroke:
-            data.append([w.getparams(), '\x00' * 6000])
+            data.append([w.getparams(), b'\x00' * 6000])
 
     # writes rounds an extra time before starting
     add_row(rows[0], False)

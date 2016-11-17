@@ -95,9 +95,8 @@ def methodPrinter(pNote, stage):
     f = open("text/%s %s.txt" % (pNote, stage), "w")
     f.write(str(stageN)+"\n")
 
-    rounds = range(1, stageN+1)
-    curChange = range(1, stageN+1)
-    print(curChange)
+    rounds = list(range(1, stageN+1))
+    curChange = list(range(1, stageN+1))
 
     handstroke = True  # not used yet, but just in case for later
     while True:
